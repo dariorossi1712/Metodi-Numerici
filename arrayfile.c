@@ -10,7 +10,7 @@ int main(void){
 	FILE *f[L]; //array of file type pointers
 	for(int i=0; i<L; i++ ){
 		char filename[10];
-		sprintf(filename, "file%d.dat", i); //it modifies at each  the name of the file to be created
+		sprintf(filename, "file%d.dat", i); //it modifies each time the name of the file to be created
 		f[i]=fopen(filename, "w");
 		if(f[i]==NULL){	//check if the file is opened correctly
 	 		perror("File non correttamente aperto");
