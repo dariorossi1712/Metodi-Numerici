@@ -192,7 +192,8 @@ int count(list* testa){
 
 
 
-//funzione per aggiungere alla lista elementi letti da terminale e li aggiunge in coda
+//funzione per aggiungere alla lista elementi letti da terminale e li aggiunge in coda. La funzione si blocca non appena 
+//verrà digitato il valore "0" che non potrà quindi essere contenuto nella lista. Modificare a piacimento in caso di necessità
 list *scan_term(list *d){
 	float elem;
 	int control=1;
