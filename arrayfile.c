@@ -16,7 +16,7 @@ int main(void){
 	 		perror("File non correttamente aperto");
 	 		exit(i);
 			}
-	fclose(f[i]);	
+		fclose(f[i]);	
 	}
 	return 0;
 
