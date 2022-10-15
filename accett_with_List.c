@@ -1,3 +1,8 @@
+//Program to compute the acceptance rate for different values of delta parameter of the Metropolis algorithm for a Gaussian distribution
+//You need both "metrogauss.h" and "listfunction.h" files to run it correctly
+/*You can run it in two different ways: by typing the values you want for the delta parameterdirectly from terminal 
+or by reading them from a file "delta.txt" you need to create before, with only one column of values, no matter how many.*/
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<time.h>
