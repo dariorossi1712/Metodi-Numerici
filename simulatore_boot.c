@@ -16,9 +16,9 @@ int main(void){
 	float beta_interesting[3]={0.395,0.44,0.5};   //array contenente i beta di cui voglio vedere il lattice. Assicurarsi che i valori inseriti siano presenti nel file beta_init.txt
 
 	f=fopen("beta_init.txt","r");
-	int a  = control_file(f,1);
+	control_file(f);
 	g=fopen("medie.txt","w");
-	a = control_file(g,2);
+	control_file(g);
 
 	list *b=NULL;           // lista contenente i valori dei beta, letti da file
 	b = scan_file(f,b);         // lettura dei valori dei beta, con funzione ("listfunction.h")
@@ -28,7 +28,7 @@ int main(void){
         char filemisure[20];
         sprintf(filemisure, "misure%.3f.txt", b->val); //it modifies each time the name of the file to be created
         misure[p]=fopen(filemisure, "w");
-        a = control_file(misure[p],p);
+        control_file(misure[p]);
 
 		simulazione(b->val, misure[p]); /*eseguo la simulazione per il valore di beta in causa. Funzione di simulazione_boot.h
 		Mi creerà automaticamente un file di misure contenente valore di magnetizz, energia e beta associato 
@@ -41,7 +41,7 @@ int main(void){
 	       	char filename[20];
 			sprintf(filename, "beta%.3f.txt", b->val); //it modifies each time the name of the file to be created
 	      	beta[s]=fopen(filename, "w");
-	       	a = control_file(beta[s],p);
+	       	control_file(beta[s]);
 
 	       	for(int j=0; j<nlatt; j++){
 	       	    for(int k=0; k<nlatt; k++){
