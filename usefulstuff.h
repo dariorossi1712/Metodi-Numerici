@@ -3,22 +3,22 @@
 #include<math.h>
 #include<time.h>
 
-srand(time(NULL));
+
 //funzione che restituisce un numero random tra 0 e 1 prendendo come argomento il numero di cifre decimali desiderate
 float rand_01(float r, int M){
-	
+	srand(time(NULL));
 	r=rand()%(M+1);
 	r=r/M;
 	return r;
 }
 
 //funzione per controllare la corretta apertura di un file. Ha per argomenti il puntatore al file e il "numero" di file per exit() 
-int control_file(FILE*f, int i){
+void control_file(FILE*f){
 	if(f==NULL){
 		printf("file non aperto correttamente");
-		exit(i);
+		exit(-1);
 	}
-	return i;
+	return ;
 }
 
 //funzione per calcolare la media di un array a di cui passo indirizzo puntatore e la lunghezza
