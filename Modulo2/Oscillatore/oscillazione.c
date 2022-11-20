@@ -7,13 +7,13 @@
 
 /* Programma per la simulazione dell'oscillatore armonico*/
 
-#define N 50
+#define N 10
 int Nlatt=N;
-long int seed = 13;
+long int seed = 13;  //seed per il generatore di numeri casuali ran2 importato come libreria
 float eta, d_metro; //eta=a*omega = parametro reticolo * pulsazione;  d_metro = parametro del metropolis = 2*sqrt(eta) 
 int iflag, measures, i_decorrel, i_term;  //vedi ising. i_term = passo di termalizzazione
 int npp[N], nmm[N]; //array per definire le posizioni dei primi vicini del lattice
-float field[N];
+float field[N];  // array contenente la configurazione del "percorso fatto" nel senso di path integral
 
 
 /* per ogni coordinata definisco il passo in avanti o indietro con le opportune condizioni al bordo*/
@@ -33,7 +33,8 @@ void geometry(){
 
 /* -------------------------*/
 
-/* Assegno la configurazione di partenza della catena di Markov */
+/* Assegno la configurazione di partenza della catena di Markov 
+Qui l'utilità della partenza a caldo o a freddo non ha una grande utilità*/
 void initialize_lattice(int iflag){
     float x;
     
@@ -52,7 +53,7 @@ void initialize_lattice(int iflag){
             //seed = i;
             x = 1-2*ran2(&seed);
             field[i] = x;
-            printf("%f\n", field[i]);
+            //printf("%f\n", field[i]);
         }
     }
     
@@ -95,7 +96,9 @@ void update_metropolis(){
     return;
 }
 
-double * measure(double obs[2]){
+
+/*Tale funzione ha prende come argomento un array di 2 elementi che vuiene dichiarato nel main e restituisce il puntatore ad esso*/
+double * measure(double obs[2]){ 
 
     for(int i=0; i<Nlatt; i++){
         obs[0]=obs[0] + pow(field[i],2);
@@ -105,7 +108,7 @@ double * measure(double obs[2]){
     obs[0] = obs[0]/Nlatt;  //media sul singolo path di y**2
     obs[1] = obs[1]/Nlatt;  //media sul singolo path di Delta y**2
 
-    printf("%lf  %lf\n", obs[0], obs[1]);
+    //printf("%lf  %lf\n", obs[0], obs[1]);
 
     return obs;
 }
@@ -113,48 +116,55 @@ double * measure(double obs[2]){
 
 /*=================================== SIMULAZIONE =============================================*/
 
+//NOTA: il file input.txt deve essere già presente e contenere i sei valori specificati sotto scritti in riga
+
 int main(){
-    FILE * lat, *init, *misure; // file in cui stampo il field (lat) e da cui prendo i valori iniziali ( init )
-    int x; //per leggere l'init.txt
-    //OPERAZIONI PRELIMINARI
-    init = fopen("/home/dario/Documents/Metodi/Modulo2/Oscillatore/init.txt","r" );
+    FILE * lat, *input, *misure; /* file in cui stampo il field per ogni passo del metropolis(lat, era uno schiribizzo mio, in realtà si può togliere);
+    file ( input ) da cui prendo i valori iniziali; file in cui stampo i valori medi delle osservabili della funzione measure() ( misure )*/
+    
+    int x; //per leggere l'input.txt
+    
+    //========  OPERAZIONI PRELIMINARI
+    init = fopen("/home/dario/Documents/Metodi/Modulo2/Oscillatore/input.txt","r" );
     control_file(lat);
 
     misure = fopen("/home/dario/Documents/Metodi/Modulo2/Oscillatore/misure.txt","w" );
     control_file(misure);
 
-    x= fscanf(init, "%f  %f  %d  %d  %d  %d", &eta, &d_metro, &measures, &i_decorrel, &iflag, &i_term);
-
+    x= fscanf(init, "%f  %f  %d  %d  %d  %d", &eta, &d_metro, &measures, &i_decorrel, &iflag, &i_term);/* Prendo i valoriniziali di
+    eta(float), d_metro(float) l'intervallo intorno alla posizione scelta in cui prendere la posizione di prova,
+    measures(int) numero di misure, i_decorrel(int) numero di passi del metropolis tra una misura e la successiva, iflag(int) stabilisce solo la configurazione di partenza,
+    i_term(int) numero di passi di metropolis dopo il quale si ha termalizzazione e si può iniziare a prendere misure*/
+    
+    /*lat = fopen("/home/dario/Documents/Metodi/Modulo2/Oscillatore/lattice.txt","w" );
+    control_file(lat);*/
 
     initialize_lattice(iflag);
     geometry();
 
-    //TERMALIZZAZIONE
+    //=======  TERMALIZZAZIONE
     for (int i = 1; i<i_term+1; i++){
         update_metropolis();
     }
 
-    //SESSIONE ALL'EQUILIBRIO con MISURE
+    //==========  SESSIONE ALL'EQUILIBRIO con MISURE
     double obs[2]={0,0};
     for (int iter=0; iter<measures; iter++){
         // AGGIORNAMENTO CONFIGURAZIONE
         for(int idec=0; idec<i_decorrel; idec++ ){
             update_metropolis();
-        }
+            /*for (int i = 0; i < Nlatt; i++){  //stampo su file il field ma non so a cosa serva e cosa si debba vedere
+                fprintf(lat, "%f  ", field[i]);}*/
+            
+            //fprintf(lat, "\n");
+            }
         obs[0] = measure(obs)[0];
         obs[1] = measure(obs)[1];
         //printf("%lf  %lf  %d\n", obs[0], obs[1], iter);
-        fprintf(misure,"%lf  %lf  %d\n", obs[0], obs[1], iter); //prendo misure a questa configurazione
+        fprintf(misure,"%lf  %lf  %d\n", obs[0], obs[1], iter); //prendo misure a questa configurazione e le stampo su file
     }
 
-    lat = fopen("/home/dario/Documents/Metodi/Modulo2/Oscillatore/lattice.txt","w" );
-    control_file(lat);
-    /*
-    for (i = 0; i < Nlatt; i++){  //stampo su file il field ma non so a cosa serva e cosa si debba vedere
-        fprintf(lat, '%f', field[i]);
-    }*/
-
-    fclose(lat);
+    //fclose(lat);
     fclose(misure);
     fclose(init);
     return 0;
