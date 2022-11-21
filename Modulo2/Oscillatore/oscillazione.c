@@ -48,13 +48,14 @@ void initialize_lattice(int iflag){
     }
     /* PARTENZA A CALDO (spin random, come se fosse T = infinito) */
     if(iflag == 1){
-        for(int i = 0; i<Nlatt; i++){
+        for(int i = 0; i<Nlatt-1; i++){ // faccio il for fino a Nlatt - 2 in sostanza così all'ultimo elemento posso assegnare lo stesso valore del primo completando le condizioni periodiche al contorno richieste
             //float x;
             //seed = i;
             x = 1-2*ran2(&seed);
             field[i] = x;
             //printf("%f\n", field[i]);
         }
+        field[Nlatt-1]=field[0];
     }
     
     // AGGIUNGERE IF PER RIPARTIRE DALLA CONFIGURAZIONE PRECEDENTE
@@ -78,7 +79,7 @@ void update_metropolis(){
     /*loop su tutti i siti, qui il sito non è scelto a caso ma faccio una spazzata 
     iterativa su tutti i siti, si può dimostrare che va bene lo stesso per il bilancio dettagliato, 
     ma meno banale da provare*/
-    for(int i = 0; i<Nlatt; i++){
+    for(int i = 1; i<Nlatt-1; i++){ //escludo dal for il primo e l'ultimo elemento che non voglio che cambino (visto che sto tracciando i punti iniziale e finale devono restare invariati come estremi del path oltre ad essere uguali)
         ip = npp[i];
         im = nmm[i];
         force = field[ip] + field[im];
